@@ -1,0 +1,96 @@
+﻿@page "/Index1"
+@using System.ComponentModel.DataAnnotations;
+@using DataEntryDemo.Utils.Attributes;
+
+@inherits DataEntryDemo.Pages.Index1Base;
+
+<PageTitle>Data Entry Demo</PageTitle>
+<h2>Enter Details</h2>
+
+<EditForm Model="carViewModel">
+	<DataAnnotationsValidator />
+	
+	<div style="width:100%">
+		<ValidationSummary />
+	</div><br />
+	<div style="width: 50%; float:left;margin-top: 5px;">
+		<label style="width: 90%;">
+			Name<br />
+			<InputText @bind-Value="carViewModel.CarModel.Car.Name" class="form-control" style="width: 100%;" placeholder="Name"></InputText>
+			<ValidationMessage For="@(() => carViewModel.CarModel.Car.Name)" />
+		</label><br /><br />
+		<label style="width: 90%;">
+			Color<br />
+			<InputSelect @bind-Value="carViewModel.CarModel.Car.ColorId" class="form-control" style="width: 100%;">
+				@if (carViewModel.CarModel?.Colors != null)
+				{
+					@foreach (var color in carViewModel.CarModel.Colors)
+					{
+						<option value="@color.Id">@color.Description</option>
+					}
+				}
+			</InputSelect>
+			<ValidationMessage For="@(() => carViewModel.CarModel.Car.ColorId)" />
+		</label><br /><br />
+		<label style="width: 90%;">
+			Year<br />
+			<InputText @bind-Value="carViewModel.CarModel.Car.Year" class="form-control" style="width: 100%;"></InputText>
+			<ValidationMessage For="@(() => carViewModel.CarModel.Car.Year)" />
+		</label><br /><br />
+		<label style="width: 90%;">
+			Model<br />
+			<InputSelect @bind-Value="carViewModel.CarModel.Car.ModelId" class="form-control" style="width: 100%;">
+				@if (carViewModel.CarModel?.Models != null)
+				{
+					@foreach (var model in carViewModel.CarModel.Models)
+					{
+						<option value="@model.Id">@model.Description</option>
+					}
+				}
+			</InputSelect>
+			<ValidationMessage For="@(() => carViewModel.CarModel.Car.ModelId)" />
+		</label><br /><br />
+		<label style="width: 90%;">
+			Quanity<br />
+			<InputText @bind-Value="carViewModel.CarModel.Car.Quantity" class="form-control" style="width: 100%;"></InputText>
+			<ValidationMessage For="@(() => carViewModel.CarModel.Car.Quantity)" />
+		</label><br /><br />
+		<button @onclick="@(() => carViewModel.CarModel = new())" class="btn btn-secondary" tabindex="0" style="float:left;">Cancel</button>
+	</div>
+	<div style="width: 50%; float:left;">
+		<label style="width: 90%;">
+			Release Date<br />
+			<InputDate @bind-Value="carViewModel.CarModel.Car.ReleaseDate" class="form-control" style="width: 100%;" placeholder="Release Date"></InputDate>
+			<ValidationMessage For="@(() => carViewModel.CarModel.Car.ReleaseDate)" />
+		</label><br /><br />
+		<label style="width: 90%;">
+			Last Available Date<br />
+			<InputDate @bind-Value="carViewModel.CarModel.Car.LastAvailableDate" class="form-control" style="width: 100%;"></InputDate>
+			<ValidationMessage For="@(() => carViewModel.CarModel.Car.LastAvailableDate)" />
+		</label><br /><br />
+		<label style="width: 90%;">
+			Total<br />
+			<InputText @bind-Value="carViewModel.CarModel.Car.Total" class="form-control" style="width: 100%;"></InputText>
+			<ValidationMessage For="@(() => carViewModel.CarModel.Car.Total)" />
+		</label><br /><br />
+		<label style="width: 90%;">
+			Owner<br />
+			<InputText @bind-Value="carViewModel.CarModel.Car.Owner" class="form-control" style="width: 100%;"></InputText>
+			<ValidationMessage For="@(() => carViewModel.CarModel.Car.Owner)" />
+		</label><br /><br />
+		<label style="width: 90%;">
+			Status<br />
+			<InputSelect @bind-Value="carViewModel.CarModel.Car.StatusId" class="form-control" style="width: 100%;">
+				@if (carViewModel.CarModel?.Statuses != null)
+				{
+					@foreach (var status in carViewModel.CarModel.Statuses)
+					{
+						<option value="@status.Id">@status.Description</option>
+					}
+				}
+			</InputSelect>
+			<ValidationMessage For="@(() => carViewModel.CarModel.Car.StatusId)" />
+		</label><br /><br />
+		<input type="submit" tabindex="0" class="btn btn-primary" style="float:right;margin-right: 10%;" value="Create" />
+	</div>
+</EditForm>
