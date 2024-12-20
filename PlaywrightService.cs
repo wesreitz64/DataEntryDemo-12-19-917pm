@@ -1,73 +1,69 @@
-﻿using System;
-using System.Globalization;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
-
-using Microsoft.Playwright;
-
-public  class PlaywrightService
+﻿namespace DataEntryDemo
 {
-    private IPage _page;
+    using System;
+    using System.Globalization;
+    using System.Text.RegularExpressions;
+    using System.Xml.Linq;
+    using Microsoft.Playwright;
 
-    public async Task InitializeBrowserAsync ()
+    public class PlaywrightService
     {
-        var playwright = await Playwright.CreateAsync();
-        var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+        public IPage _page { get; set; }
+        public IBrowser _browser { get; set; }
+        public IBrowserContext browserContext { get; set; }
+        public IPlaywright _playwright { get; set; }
+        private TaskCompletionSource<bool> _userClickedCreateButtonTcs = new();
+
+
+        public async Task PerformAutomationStepsAsync ()
         {
-            Headless = false // Keep browser visible for testing
-        });
+            var playwright = await Playwright.CreateAsync();
 
-        var context = await browser.NewContextAsync();
-        _page = await context.NewPageAsync();
+            await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+            {
+                Headless = false, // Keep browser visible for testing
+            });
+
+            var context = await browser.NewContextAsync();
+            var page = await context.NewPageAsync();
+
+            // Navigate to the webpage
+            await page.GotoAsync("https://acc3inter01.pegalabs.io/prweb/PRServlet/app/default/beEBp4uRVTogorRwSwWqbOtn9IL2fwdI*/!STANDARD");
+
+            // Perform Login
+            await page.GetByPlaceholder("User name").FillAsync("wesley.reitz@acc3int.com");
+            await page.GetByPlaceholder("Password", new() { Exact = true }).FillAsync("Install@1234");
+            await page.GetByRole(AriaRole.Button, new() { Name = "Log in" }).ClickAsync();
+
+            // Navigate to Data Entry and fill the form
+            await page.Locator("a").Filter(new() { HasTextRegex = new Regex("^Create$") }).ClickAsync();
+            await page.GetByRole(AriaRole.Link, new() { Name = "Data Entry" }).ClickAsync();
+
+            // Fill form fields
+            await page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).FillAsync("name");
+            await page.GetByLabel("ReleaseDate").FillAsync("11/24/2024");
+            await page.GetByLabel("Color").FillAsync("red");
+            await page.GetByLabel("LastAvailableDate").FillAsync("12/31/2025");
+            await page.GetByLabel("Year").FillAsync("2025");
+            await page.GetByLabel("Total").FillAsync("150,000");
+            await page.GetByLabel("Model").FillAsync("Mustang");
+            await page.GetByLabel("Owner").FillAsync("Fred Barnes");
+            await page.GetByLabel("Quantity").FillAsync("3");
+            await page.GetByLabel("Status").FillAsync("Like New");
+
+            // Wait for the user to signal continuation
+            await _userClickedCreateButtonTcs.Task;
+
+            // Finish automation
+            await page.GetByRole(AriaRole.Button, new() { Name = "Create" }).ClickAsync();
+            await page.GotoAsync("https://example.com");
+        }
+        public void SignalUserClickedCreateButton ()
+        {
+            _userClickedCreateButtonTcs.TrySetResult(true);
+        }
+
+   
     }
 
-
-    public async Task PerformManualLoginAsync (string loginUrl)
-    {
-        if (_page == null) throw new InvalidOperationException("Browser not initialized.");
-
-        // Navigate to the login page
-        await _page.GotoAsync(loginUrl);
-
-        Console.WriteLine("Waiting for user to log in...");
-
-        await _page.WaitForURLAsync(url => url != loginUrl, new() { Timeout = 60000 });
-
-        Console.WriteLine("Login successful. Navigated to a new page.");
-
-        // Call NavigateToDataFormAsync after login and navigation
-        await NavigateToDataFormAsync();
-    }
-
-
-    public async Task NavigateAndLoginAsync (string url, string username, string password)
-    {
-        if (_page == null) throw new InvalidOperationException("Browser not initialized.");
-
-        await _page.GotoAsync(url);
-
-        // Perform Login
-        await _page.GetByPlaceholder("User name").FillAsync(username);
-        await _page.GetByPlaceholder("Password", new() { Exact = true }).FillAsync(password);
-        await _page.GetByRole(AriaRole.Button, new() { Name = "Log in" }).ClickAsync();
-    }
-
-    public async Task NavigateToDataFormAsync ()
-    {
-        if (_page == null) throw new InvalidOperationException("Browser not initialized.");
-
-        await _page.Locator("a").Filter(new() { HasTextRegex = new Regex("^Create$") }).ClickAsync();
-        await _page.GetByRole(AriaRole.Link, new() { Name = "Data Entry" }).ClickAsync();
-    }
-
-    public async Task FillInFormAsync (DataEntryDemo.Pages.Index.Car car)
-    {
-        if (_page == null) throw new InvalidOperationException("Browser not initialized.");
-
-        await _page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).FillAsync(car.Name);
-        string releaseFormattedDate = car.ReleaseDate.GetValueOrDefault().ToString("MM/dd/yyyy");
-        await _page.GetByLabel("ReleaseDate").FillAsync(releaseFormattedDate);
-        // Repeat for other fields...
-    }
 }
-
