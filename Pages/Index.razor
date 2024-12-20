@@ -300,7 +300,7 @@
 	protected async Task SendCarData(Car car)
 	{
 		var f = car;
-		await PlaywrightService.PerformAutomationStepsAsync();
+		await PlaywrightService.PerformAutomationStepsAsync(car);
 	}
 
 	protected void Cancel()
@@ -316,7 +316,7 @@
 	}
 	protected async override Task OnAfterRenderAsync(bool firstRender)
 	{if (firstRender){
-			await PlaywrightService.PerformAutomationStepsAsync();
+			await PlaywrightService.PerformAutomationStepsAsync(new Car());
 		//	await PlaywrightService.InitializeBrowserAsync();
 	}
 	//	await PlaywrightService.PerformManualLoginAsync("https://acc3inter01.pegalabs.io/prweb/...");

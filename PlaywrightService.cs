@@ -4,6 +4,7 @@
     using System.Globalization;
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
+    using DataEntryDemo.Data;
     using Microsoft.Playwright;
 
     public class PlaywrightService
@@ -15,7 +16,7 @@
         private TaskCompletionSource<bool> _userClickedCreateButtonTcs = new();
 
 
-        public async Task PerformAutomationStepsAsync ()
+        public async Task PerformAutomationStepsAsync (Car car)
         {
             var playwright = await Playwright.CreateAsync();
 
@@ -40,16 +41,16 @@
             await page.GetByRole(AriaRole.Link, new() { Name = "Data Entry" }).ClickAsync();
 
             // Fill form fields
-            await page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).FillAsync("name");
-            await page.GetByLabel("ReleaseDate").FillAsync("11/24/2024");
-            await page.GetByLabel("Color").FillAsync("red");
-            await page.GetByLabel("LastAvailableDate").FillAsync("12/31/2025");
-            await page.GetByLabel("Year").FillAsync("2025");
-            await page.GetByLabel("Total").FillAsync("150,000");
-            await page.GetByLabel("Model").FillAsync("Mustang");
-            await page.GetByLabel("Owner").FillAsync("Fred Barnes");
-            await page.GetByLabel("Quantity").FillAsync("3");
-            await page.GetByLabel("Status").FillAsync("Like New");
+            await page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).FillAsync(car?.Name ?? "");
+                    await page.GetByLabel("ReleaseDate").FillAsync(car?.ReleaseDate?.ToString("MM/dd/yyyy") ?? "");
+            await page.GetByLabel("Color").FillAsync(car?.ColorId.ToString() ?? "");
+            await page.GetByLabel("LastAvailableDate").FillAsync(car?.LastAvailableDate?.ToString("MM/dd/yyyy") ?? "");
+            await page.GetByLabel("Year").FillAsync(car?.Year?.ToString() ?? "");
+            await page.GetByLabel("Total").FillAsync(car?.Total?.ToString() ?? "");
+            await page.GetByLabel("Model").FillAsync(car?.ModelId.ToString() ?? "");
+            await page.GetByLabel("Owner").FillAsync(car?.Owner?.ToString() ?? "");
+            await page.GetByLabel("Quantity").FillAsync(car?.Quantity?.ToString() ?? "");
+            await page.GetByLabel("Status").FillAsync(car?.StatusId.ToString() ??  "");
 
             // Wait for the user to signal continuation
             await _userClickedCreateButtonTcs.Task;
