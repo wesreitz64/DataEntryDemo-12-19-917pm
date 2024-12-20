@@ -43,23 +43,31 @@
             await page.Locator("a").Filter(new() { HasTextRegex = new Regex("^Create$") }).ClickAsync();
             await page.GetByRole(AriaRole.Link, new() { Name = "Data Entry" }).ClickAsync();
             
-            await page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).FillAsync("myname");
+  //          await page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).FillAsync("myname");
             await _userClickedCreateButtonTcs.Task;
 
         }
 
-        public static async Task FillFormField (Car car)
+        public static async Task FillFormField (CarModel cm)
         {
-            await page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).FillAsync(car.Name);
-            await page.GetByLabel("ReleaseDate").FillAsync(car?.ReleaseDate?.ToString("MM/dd/yyyy") ?? "");
-            await page.GetByLabel("Color").FillAsync(car?.ColorId.ToString() ?? "");
-            await page.GetByLabel("LastAvailableDate").FillAsync(car?.LastAvailableDate?.ToString("MM/dd/yyyy") ?? "");
-            await page.GetByLabel("Year").FillAsync(car?.Year?.ToString() ?? "");
-            await page.GetByLabel("Total").FillAsync(car?.Total?.ToString() ?? "");
-            await page.GetByLabel("Model").FillAsync(car?.ModelId.ToString() ?? "");
-            await page.GetByLabel("Owner").FillAsync(car?.Owner?.ToString() ?? "");
-            await page.GetByLabel("Quantity").FillAsync(car?.Quantity?.ToString() ?? "");
-            await page.GetByLabel("Status").FillAsync(car?.StatusId.ToString() ?? "");
+           
+            await page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).FillAsync(cm?.Car?.Name ?? "");
+            await page.GetByLabel("ReleaseDate").FillAsync(cm?.Car?.ReleaseDate?.ToString("MM/dd/yyyy") ?? "");
+
+            string colorName = cm.GetColorFromID(cm.Car!.ColorId);
+            await page.GetByLabel("Color").FillAsync(colorName ?? "");
+
+            await page.GetByLabel("LastAvailableDate").FillAsync(cm.Car?.LastAvailableDate?.ToString("MM/dd/yyyy") ?? "");
+            await page.GetByLabel("Year").FillAsync(cm.Car?.Year?.ToString() ?? "");
+            await page.GetByLabel("Total").FillAsync(cm.Car?.Total?.ToString() ?? "");
+
+            string modelName = cm.GetModelFromID(cm?.Car?.ModelId ?? 0 );
+            await page.GetByLabel("Model").FillAsync(modelName ?? "");
+            await page.GetByLabel("Owner").FillAsync(cm.Car?.Owner?.ToString() ?? "");
+            await page.GetByLabel("Quantity").FillAsync(cm.Car?.Quantity?.ToString() ?? "");
+
+            string statusName = cm.GetStatusFromID(cm?.Car?.StatusId ?? 0);
+            await page.GetByLabel("Status").FillAsync(statusName ?? "");
 
             // Wait for the user to signal continuation
             await _userClickedCreateButtonTcs.Task;

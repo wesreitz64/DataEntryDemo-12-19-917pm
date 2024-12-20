@@ -254,6 +254,7 @@
                 if (isValid)
                 {
                     CarData.Car.StatusId = statusValue;
+                   
                 }
                 else
                 {
@@ -263,7 +264,7 @@
         }
 
 
-        SendCarData(CarData.Car);
+       await  SendCarData(CarData!);
 
 
         return validationResult;
@@ -298,11 +299,9 @@
     protected void OnHandleInvalidSubmit()
     { }
 
-    protected async Task SendCarData(Car car)
+    protected async Task SendCarData(CarModel carModel)
     {
-        var f = car;
-        await PlaywrightService.FillFormField(car);
-        //	var url = "https://acc3inter01.pegalabs.io/prweb/PRServlet/app/deployment-tracker_/PXqqy77XbhP9IUZZoKBtbrjLTFKVT0v4*/!STANDARD?pzPostData=-1419787207&mSessionThreadName=default";
+        await PlaywrightService.FillFormField(carModel);
     }
 
     protected void Cancel()
@@ -321,16 +320,11 @@
         if (firstRender)
         {
             await PlaywrightService.PerformAutomationStepsAsync(new Car());
-            await PlaywrightService.FillFormField(new Car());
+            await PlaywrightService.FillFormField(new CarModel());
         }
 
     }
-    // private async Task SendData()
-    // {
-    // 	var url = "https://acc3inter01.pegalabs.io/prweb/PRServlet/app/deployment-tracker_/PXqqy77XbhP9IUZZoKBtbrjLTFKVT0v4*/!STANDARD";
-    // 	var queryParams = "?name=wes";
-    // 	 Navigation.NavigateTo(url + queryParams, true);
-    // }
+
     protected void Dispose()
     {
     }
@@ -454,63 +448,5 @@
     }
 
 
-    // public class CarModel
-    // {
-    // 	[Required]
-    // 	public Car? Car { set; get; } = new Car();
-    // 	public List<Color>? Colors { set; get; } = new List<Color>();
-    // 	public List<Model>? Models { set; get; } = new List<Model>();
-    // 	public List<Status>? Statuses { set; get; } = new List<Status>();
-    // }
-
-    // public class Car
-    // {
-    // 	[Required]
-    // 	public string Name { set; get; } = "";
-    // 	[Required]
-    // 	[Range(1, 5)]
-    // 	public int ColorId { set; get; } = 0;
-    // 	[Required]
-    // 	[Range(2000, 2025)]
-    // 	public string? Year { set; get; } = null;
-    // 	[Required]
-    // 	[Range(1, 5)]
-    // 	public int ModelId { set; get; } = 0;
-    // 	[Required]
-    // 	[Range(1, 10)]
-    // 	public string? Quantity { set; get; } = null;
-    // 	[Required]
-    // 	[DataType(DataType.DateTime)]
-    // 	[DateMustBeBefore(nameof(LastAvailableDate))]
-    // 	public DateTime? ReleaseDate { set; get; }
-    // 	[Required]
-    // 	[DateMustBeAfter(nameof(ReleaseDate))]
-    // 	[DataType(DataType.DateTime)]
-    // 	public DateTime? LastAvailableDate { set; get; }
-    // 	[Required]
-    // 	public string? Total { set; get; } = null;
-    // 	[Required]
-    // 	public string? Owner { set; get; } = null;
-    // 	[Required]
-    // 	[Range(1, 5)]
-    // 	public int StatusId { set; get; } = 0;
-    // }
-
-    // public class Color
-    // {
-    // 	public int Id { set; get; }
-    // 	public string? Description { set; get; }
-    // }
-
-    // public class Model
-    // {
-    // 	public int Id { set; get; }
-    // 	public string? Description { set; get; }
-    // }
-
-    // public class Status
-    // {
-    // 	public int Id { set; get; }
-    // 	public string? Description { set; get; }
-    // }
+    
 }
