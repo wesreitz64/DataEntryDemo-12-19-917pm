@@ -18,13 +18,13 @@
         <label style="width: 90%;">
             Name<br />
             <InputText ValueExpression="@(() => CarData.Car.Name)" Value="@CarData.Car.Name" ValueChanged="@((string value) => HandleOnChange(value, "Name"))"
-                       class="form-control" style="width: 100%;"></InputText>
+            class="form-control" style="width: 100%;"></InputText>
             <ValidationMessage For="@(() => CarData.Car.Name)" />
         </label><br /><br />
         <label style="width: 90%;">
             Color<br />
             <InputSelect ValueExpression="@(() => CarData.Car.ColorId)" Value="@CarData.Car.ColorId" ValueChanged="@((int value) => HandleOnChange(value, "Color"))"
-                         class="form-control" style="width: 100%;">
+            class="form-control" style="width: 100%;">
                 @if (CarData?.Colors != null)
                 {
                     @foreach (var color in CarData.Colors)
@@ -38,12 +38,12 @@
         <label style="width: 90%;">
             Year<br />
             <InputText ValueExpression="@(() => CarData.Car.Year)" Value="@CarData.Car.Year" ValueChanged="@((string value) => HandleOnChange(value, "Year"))"
-                       class="form-control" style="width: 100%;"></InputText>
+            class="form-control" style="width: 100%;"></InputText>
         </label><br /><br />
         <label style="width: 90%;">
             Model<br />
             <InputSelect ValueExpression="@(() => CarData.Car.ModelId)" Value="@CarData.Car.ModelId" ValueChanged="@((int value) => HandleOnChange(value, "Model"))"
-                         class="form-control" style="width: 100%;">
+            class="form-control" style="width: 100%;">
                 @if (CarData?.Models != null)
                 {
                     @foreach (var model in CarData.Models)
@@ -57,7 +57,7 @@
         <label style="width: 90%;">
             Quanity<br />
             <InputText ValueExpression="@(() => CarData.Car.Quantity)" Value="@CarData.Car.Quantity" ValueChanged="@((string value) => HandleOnChange(value, "Quantity"))"
-                       class="form-control" style="width: 100%;"></InputText>
+            class="form-control" style="width: 100%;"></InputText>
             <ValidationMessage For="@(() => CarData.Car.Quantity)" />
         </label><br /><br />
         <button @onclick="@(() => CarData = new())" class="btn btn-secondary" tabindex="0" style="float:left;">Cancel</button>
@@ -66,31 +66,31 @@
         <label style="width: 90%;">
             Release Date<br />
             <InputDate ValueExpression="@(() => CarData.Car.ReleaseDate)" Value="@CarData.Car.ReleaseDate" ValueChanged="@((DateTime? value) => HandleOnChange(value, "ReleaseDate"))"
-                       class="form-control" style="width: 100%;" placeholder="Release Date"></InputDate>
+            class="form-control" style="width: 100%;" placeholder="Release Date"></InputDate>
 
         </label><br /><br />
         <label style="width: 90%;">
             Last Available Date<br />
             <InputDate ValueExpression="@(() => CarData.Car.LastAvailableDate)" Value="@CarData.Car.LastAvailableDate" ValueChanged="@((DateTime? value) => HandleOnChange(value, "LastAvailableDate"))"
-                       class="form-control" style="width: 100%;"></InputDate>
+            class="form-control" style="width: 100%;"></InputDate>
             <ValidationMessage For="@(() => CarData.Car.LastAvailableDate)" />
         </label><br /><br />
         <label style="width: 90%;">
             Total<br />
             <InputText ValueExpression="@(() => CarData.Car.Total)" Value="@CarData.Car.Total" ValueChanged="@((string value) => HandleOnChange(value, "Total"))"
-                       class="form-control" style="width: 100%;"></InputText>
+            class="form-control" style="width: 100%;"></InputText>
             <ValidationMessage For="@(() => CarData.Car.Total)" />
         </label><br /><br />
         <label style="width: 90%;">
             Owner<br />
             <InputText ValueExpression="@(() => CarData.Car.Owner)" Value="@CarData.Car.Owner" ValueChanged="@((string value) => HandleOnChange(value, "Owner"))"
-                       class="form-control" style="width: 100%;"></InputText>
+            class="form-control" style="width: 100%;"></InputText>
             <ValidationMessage For="@(() => CarData.Car.Owner)" />
         </label><br /><br />
         <label style="width: 90%;">
             Status<br />
             <InputSelect ValueExpression="@(() => CarData.Car.StatusId)" Value="@CarData.Car.StatusId" ValueChanged="@((int value) => HandleOnChange(value, "Status"))"
-                         class="form-control" style="width: 100%;">
+            class="form-control" style="width: 100%;">
                 @if (CarData?.Statuses != null)
                 {
                     @foreach (var status in CarData.Statuses)
@@ -254,7 +254,7 @@
                 if (isValid)
                 {
                     CarData.Car.StatusId = statusValue;
-                   
+
                 }
                 else
                 {
@@ -264,7 +264,7 @@
         }
 
 
-       await  SendCarData(CarData!);
+        await  SendCarData(CarData!);
 
 
         return validationResult;
@@ -301,6 +301,7 @@
 
     protected async Task SendCarData(CarModel carModel)
     {
+        if (carModel == null) return;
         await PlaywrightService.FillFormField(carModel);
     }
 
