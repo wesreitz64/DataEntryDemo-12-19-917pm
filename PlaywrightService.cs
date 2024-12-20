@@ -2,112 +2,72 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using DataEntryDemo.Data;
+
 using Microsoft.Playwright;
 
-public class PlaywrightService
+public  class PlaywrightService
 {
-    private TaskCompletionSource<bool> _userClickedCreateButtonTcs = new();
-   
-    public PlaywrightService () { }
+    private IPage _page;
 
-    public async Task ExecuteFormAutomationAsync (CarModel carData)
-    {
-        var retryCount = 0;
-        const int maxRetries = 2;
-
-        while (true)
-        {
-            try
-            {
-                await PerformAutomationStepsAsync(carData);
-                break; // Exit loop if successful
-            }
-            catch (Exception ex)
-            {
-                retryCount++;
-                Console.WriteLine($"Attempt {retryCount} failed: {ex.Message}");
-
-                if (retryCount > maxRetries)
-                {
-                    Console.WriteLine("Max retry attempts reached. Aborting automation.");
-                    throw;
-                }
-
-                Console.WriteLine("Retrying...");
-            }
-        }
-    }
-
-    private async Task PerformAutomationStepsAsync (CarModel carData)
+    public async Task InitializeBrowserAsync ()
     {
         var playwright = await Playwright.CreateAsync();
-
-        await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+        var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
-            Headless = false, // Keep browser visible for testing
+            Headless = false // Keep browser visible for testing
         });
 
         var context = await browser.NewContextAsync();
-        var page = await context.NewPageAsync();
+        _page = await context.NewPageAsync();
+    }
 
-        // Navigate to the webpage
-        await page.GotoAsync("https://acc3inter01.pegalabs.io/prweb/PRServlet/app/default/beEBp4uRVTogorRwSwWqbOtn9IL2fwdI*/!STANDARD");
+
+    public async Task PerformManualLoginAsync (string loginUrl)
+    {
+        if (_page == null) throw new InvalidOperationException("Browser not initialized.");
+
+        // Navigate to the login page
+        await _page.GotoAsync(loginUrl);
+
+        Console.WriteLine("Waiting for user to log in...");
+
+        await _page.WaitForURLAsync(url => url != loginUrl, new() { Timeout = 60000 });
+
+        Console.WriteLine("Login successful. Navigated to a new page.");
+
+        // Call NavigateToDataFormAsync after login and navigation
+        await NavigateToDataFormAsync();
+    }
+
+
+    public async Task NavigateAndLoginAsync (string url, string username, string password)
+    {
+        if (_page == null) throw new InvalidOperationException("Browser not initialized.");
+
+        await _page.GotoAsync(url);
 
         // Perform Login
-        await PerformLogin(page);
-
-        // Navigate to Data Entry and fill the form
-        await NavigateToDataForm(page);
-
-        // Fill form fields
-        await FillInForm(page,carData);
-
-        // Wait for the user to signal continuation
-        await _userClickedCreateButtonTcs.Task;
-
-        // Finish automation
-       // await SubmitFilledInForm(page);
+        await _page.GetByPlaceholder("User name").FillAsync(username);
+        await _page.GetByPlaceholder("Password", new() { Exact = true }).FillAsync(password);
+        await _page.GetByRole(AriaRole.Button, new() { Name = "Log in" }).ClickAsync();
     }
 
-    private static async Task SubmitFilledInForm (IPage page)
+    public async Task NavigateToDataFormAsync ()
     {
-        await page.GetByRole(AriaRole.Button, new() { Name = "Create" }).ClickAsync();
-        await page.GotoAsync("https://example.com");
+        if (_page == null) throw new InvalidOperationException("Browser not initialized.");
+
+        await _page.Locator("a").Filter(new() { HasTextRegex = new Regex("^Create$") }).ClickAsync();
+        await _page.GetByRole(AriaRole.Link, new() { Name = "Data Entry" }).ClickAsync();
     }
 
-    private static async Task FillInForm (IPage page, CarModel? carData)
+    public async Task FillInFormAsync (DataEntryDemo.Pages.Index.Car car)
     {
-        await page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).FillAsync(carData!.Car!.Name);
-        string releaseFormattedDate = carData.Car.ReleaseDate.GetValueOrDefault().ToString("MM/dd/yyyy");
-        await page.GetByLabel("ReleaseDate").FillAsync(releaseFormattedDate);
-        await page.GetByLabel("Color").FillAsync(carData!.Car!.ColorId.ToString());
-        string lastFormattedDate = carData.Car.LastAvailableDate.GetValueOrDefault().ToString("MM/dd/yyyy");
-        await page.GetByLabel("LastAvailableDate").FillAsync(lastFormattedDate);
-        await page.GetByLabel("Year").FillAsync(carData!.Car!.Year!.ToString());
-        string formattedTotal = carData!.Car!.Total!.ToString(  );
-        await page.GetByLabel("Total").FillAsync(formattedTotal);
-        await page.GetByLabel("Model").FillAsync(carData.Car.ModelId.ToString());
-        await page.GetByLabel("Owner").FillAsync(carData!.Car!.Owner!);
-        await page.GetByLabel("Quantity").FillAsync(carData!.Car!.Quantity!.ToString());
-        await page.GetByLabel("Status").FillAsync(carData!.Car!.StatusId!.ToString());
-    }
+        if (_page == null) throw new InvalidOperationException("Browser not initialized.");
 
-    private static async Task NavigateToDataForm (IPage page)
-    {
-        await page.Locator("a").Filter(new() { HasTextRegex = new Regex("^Create$") }).ClickAsync();
-        await page.GetByRole(AriaRole.Link, new() { Name = "Data Entry" }).ClickAsync();
-    }
-
-    private static async Task PerformLogin (IPage page)
-    {
-        await page.GetByPlaceholder("User name").FillAsync("wesley.reitz@acc3int.com");
-        await page.GetByPlaceholder("Password", new() { Exact = true }).FillAsync("Install@1234");
-        await page.GetByRole(AriaRole.Button, new() { Name = "Log in" }).ClickAsync();
-    }
-
-    public void SignalUserClickedCreateButton ()
-    {
-        _userClickedCreateButtonTcs.TrySetResult(true);
+        await _page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).FillAsync(car.Name);
+        string releaseFormattedDate = car.ReleaseDate.GetValueOrDefault().ToString("MM/dd/yyyy");
+        await _page.GetByLabel("ReleaseDate").FillAsync(releaseFormattedDate);
+        // Repeat for other fields...
     }
 }
+

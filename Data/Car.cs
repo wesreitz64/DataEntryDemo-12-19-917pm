@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DataEntryDemo.Data
 {
-	public class Car
+	public class Car2
 	{
 		[Required]
 		public string Name { set; get; } = "";

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using DataEntryDemo.Data;
+using static DataEntryDemo.Pages.Index;
 
 namespace DataEntryDemo.Data
 {

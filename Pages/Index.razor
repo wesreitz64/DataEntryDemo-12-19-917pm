@@ -3,7 +3,7 @@
 @using System.ComponentModel.DataAnnotations;
 @using DataEntryDemo.Utils.Attributes;
 
-
+@inject PlaywrightService PlaywrightService
 <PageTitle>Data Entry Demo</PageTitle>
 <h2>Enter Details</h2>
 
@@ -298,10 +298,10 @@
 
 	}
 
-	protected void SendCarData(Car car)
+	protected async Task SendCarData(Index.Car car)
 	{
 		var f = car;
-
+		await PlaywrightService.FillInFormAsync(car);
 	}
 
 	protected void Cancel()
@@ -316,8 +316,16 @@
 		CarData.Colors = await PopulateColors();
 		CarData.Models = await PopulateModels();
 		CarData.Statuses = await PopulateStatus();
-
 		base.OnInitialized();
+	}
+	protected async override Task OnAfterRenderAsync(bool firstRender)
+	{
+		await PlaywrightService.InitializeBrowserAsync();
+	//	await PlaywrightService.PerformManualLoginAsync("https://acc3inter01.pegalabs.io/prweb/...");
+
+	await PlaywrightService.NavigateAndLoginAsync("https://acc3inter01.pegalabs.io/prweb/...", "wesley.reitz@acc3int.com", "Install@1234");
+		await PlaywrightService.NavigateToDataFormAsync();
+
 	}
 
 	protected void Dispose()
