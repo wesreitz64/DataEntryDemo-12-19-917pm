@@ -5,18 +5,21 @@
     using System.Text.RegularExpressions;
     using System.Xml.Linq;
     using DataEntryDemo.Data;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.Playwright;
 
-    public class PlaywrightService
+    public static class PlaywrightService
     {
-        public IPage _page { get; set; }
-        public IBrowser _browser { get; set; }
-        public IBrowserContext browserContext { get; set; }
-        public IPlaywright _playwright { get; set; }
-        private TaskCompletionSource<bool> _userClickedCreateButtonTcs = new();
+        public static IPage page { get; set; }
+        public static IBrowser _browser { get; set; }
+        public static IBrowserContext context { get; set; }
+        public static IPlaywright _playwright { get; set; }
+        private static TaskCompletionSource<bool> _userClickedCreateButtonTcs = new();
 
+        public static IPage GetPage() { return page; }   
+        public static IBrowserContext GetBrowser() { return context; }
 
-        public async Task PerformAutomationStepsAsync (Car car)
+        public static async Task PerformAutomationStepsAsync (Car car)
         {
             var playwright = await Playwright.CreateAsync();
 
@@ -24,9 +27,9 @@
             {
                 Headless = false, // Keep browser visible for testing
             });
-
+            _browser = browser;
             var context = await browser.NewContextAsync();
-            var page = await context.NewPageAsync();
+             page = await context.NewPageAsync();
 
             // Navigate to the webpage
             await page.GotoAsync("https://acc3inter01.pegalabs.io/prweb/PRServlet/app/default/beEBp4uRVTogorRwSwWqbOtn9IL2fwdI*/!STANDARD");
@@ -39,10 +42,16 @@
             // Navigate to Data Entry and fill the form
             await page.Locator("a").Filter(new() { HasTextRegex = new Regex("^Create$") }).ClickAsync();
             await page.GetByRole(AriaRole.Link, new() { Name = "Data Entry" }).ClickAsync();
+            
+            await page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).FillAsync("myname");
+            await _userClickedCreateButtonTcs.Task;
 
-            // Fill form fields
-            await page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).FillAsync(car?.Name ?? "");
-                    await page.GetByLabel("ReleaseDate").FillAsync(car?.ReleaseDate?.ToString("MM/dd/yyyy") ?? "");
+        }
+
+        public static async Task FillFormField (Car car)
+        {
+            await page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).FillAsync(car.Name);
+            await page.GetByLabel("ReleaseDate").FillAsync(car?.ReleaseDate?.ToString("MM/dd/yyyy") ?? "");
             await page.GetByLabel("Color").FillAsync(car?.ColorId.ToString() ?? "");
             await page.GetByLabel("LastAvailableDate").FillAsync(car?.LastAvailableDate?.ToString("MM/dd/yyyy") ?? "");
             await page.GetByLabel("Year").FillAsync(car?.Year?.ToString() ?? "");
@@ -50,7 +59,7 @@
             await page.GetByLabel("Model").FillAsync(car?.ModelId.ToString() ?? "");
             await page.GetByLabel("Owner").FillAsync(car?.Owner?.ToString() ?? "");
             await page.GetByLabel("Quantity").FillAsync(car?.Quantity?.ToString() ?? "");
-            await page.GetByLabel("Status").FillAsync(car?.StatusId.ToString() ??  "");
+            await page.GetByLabel("Status").FillAsync(car?.StatusId.ToString() ?? "");
 
             // Wait for the user to signal continuation
             await _userClickedCreateButtonTcs.Task;
@@ -59,7 +68,8 @@
             await page.GetByRole(AriaRole.Button, new() { Name = "Create" }).ClickAsync();
             await page.GotoAsync("https://example.com");
         }
-        public void SignalUserClickedCreateButton ()
+
+        public static void SignalUserClickedCreateButton ()
         {
             _userClickedCreateButtonTcs.TrySetResult(true);
         }
