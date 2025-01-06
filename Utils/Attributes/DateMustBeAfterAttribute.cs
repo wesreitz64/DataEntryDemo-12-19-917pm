@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace DataEntryDemo.Utils.Attributes
 {
@@ -30,4 +31,26 @@ namespace DataEntryDemo.Utils.Attributes
 			return ValidationResult.Success;
 		}
 	}
+}
+
+public class LettersAndNumbersAttribute : ValidationAttribute
+{
+    protected override ValidationResult IsValid (object value, ValidationContext validationContext)
+    {
+        if (value == null)
+        {
+            // Allow nulls if you want it to be optional
+            return ValidationResult.Success;
+        }
+
+        var stringValue = value.ToString();
+        var regex = new Regex("^[a-zA-Z0-9]*$"); // Matches only letters and numbers
+
+        if (regex.IsMatch(stringValue))
+        {
+            return ValidationResult.Success;
+        }
+
+        return new ValidationResult("The field must only contain letters or numbers.");
+    }
 }

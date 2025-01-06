@@ -94,3 +94,27 @@
 		<input type="submit" tabindex="0" class="btn btn-primary" style="float:right;margin-right: 10%;" value="Create" />
 	</div>
 </EditForm>
+
+<style>
+		.dropdown-select {
+		appearance: auto; /* Ensure default browser styling for dropdowns */
+		-webkit-appearance: auto;
+		-moz-appearance: auto;
+		background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 5"><polygon points="0,0 10,0 5,5" style="fill:%23333;"></polygon></svg>'); /* Optional: Custom arrow icon */
+		background-repeat: no-repeat;
+		background-position: right 10px center;
+		background-size: 10px 5px;
+		padding-right: 30px; /* Space for the arrow */
+		border: 1px solid #ccc; /* Optional: Adjust the border */
+		border-radius: 4px; /* Optional: Rounded corners */
+	}
+
+	select.form-control {
+		border: solid green 4px;
+		background-image: url('/images/dropdown-arrow.svg');
+		background-repeat: no-repeat;
+		background-position-x: right;
+		background-size: 20px;
+		background-position-y: center;
+	}
+</style>

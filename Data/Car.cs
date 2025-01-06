@@ -6,6 +6,7 @@ namespace DataEntryDemo.Data
 	public class Car
 	{
 		[Required]
+		[LettersAndNumbers]
 		public string Name { set; get; } = "";
 		[Required]
 		[Range(1, 5)]

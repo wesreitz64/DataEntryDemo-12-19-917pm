@@ -17,7 +17,7 @@
     <div style="width: 50%; float:left;margin-top: 5px;">
         <label style="width: 90%;">
             Name<br />
-            <InputText ValueExpression="@(() => CarData.Car.Name)" Value="@CarData.Car.Name" ValueChanged="@((string value) => HandleOnChange(value, "Name"))"
+            <InputText ValueExpression="@(() => CarData!.Car.Name)" Value="@CarData.Car.Name" ValueChanged="@((string value) => HandleOnChange(value, "Name"))"
             class="form-control" style="width: 100%;"></InputText>
             <ValidationMessage For="@(() => CarData.Car.Name)" />
         </label><br /><br />
@@ -39,6 +39,7 @@
             Year<br />
             <InputText ValueExpression="@(() => CarData.Car.Year)" Value="@CarData.Car.Year" ValueChanged="@((string value) => HandleOnChange(value, "Year"))"
             class="form-control" style="width: 100%;"></InputText>
+            <ValidationMessage For="@(() => CarData.Car.Year)" />
         </label><br /><br />
         <label style="width: 90%;">
             Model<br />
@@ -447,7 +448,32 @@
                 new Status() { Id = 5, Description = "Questionable"}
                         });
     }
-
+ 
 
     
 }
+
+<style>
+    .dropdown-select {
+        appearance: auto; /* Ensure default browser styling for dropdowns */
+        -webkit-appearance: auto;
+        -moz-appearance: auto;
+        background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 5"><polygon points="0,0 10,0 5,5" style="fill:%23333;"></polygon></svg>'); /* Optional: Custom arrow icon */
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 10px 5px;
+        padding-right: 30px; /* Space for the arrow */
+        border: 1px solid #ccc; /* Optional: Adjust the border */
+        border-radius: 4px; /* Optional: Rounded corners */
+    }
+
+    select.form-control {
+    
+        background-image: url('/images/dropdown-arrow.svg');
+        background-repeat: no-repeat;
+        background-position-x: right;
+        background-size: 16px;
+        background-origin: content-box;
+        background-position-y: center;
+    }
+</style>
